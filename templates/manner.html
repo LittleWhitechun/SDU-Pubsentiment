@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manner</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_5m3cryo2qvq.css">
+     <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_5m3cryo2qvq.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1283614_eqf92ecqthb.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/echarts.js"></script>
+    <script src='/static/js/Convert_Pinyin.js'></script>
+    <style>
+        #chartcanvas{
+            margin-top: 25px;
+            margin-left: 210px;
+            display: inline-block
+        }
+        #linecanvas{
+            margin-top: 25px;
+            margin-left: 20px;
+            display: inline-block
+        }
+        
+    </style>	
+</head>
+<body>
+    <nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+        <ul class="navbar-nav  navbar-mynav-ul">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Active</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Disabled</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="container" id="container">
+
+        <div class="sider-bar">
+            <a class="sider-bar-title list-group-item" style="color: white">
+                舆情分析系统
+            </a>
+            <br>
+            <a class="list-group-item">
+                <div class="sider-bar-info">
+                    <img src="/static/images/icon.png">
+                    <div class="sider-bar-info-text"><h5>当前领域</h5></div>
+                    <div id="cur-field" class="sider-bar-info-text">外交</div>
+
+                    <span class="iconfont icon-yonghu2"></span>
+                    <span class="iconfont icon-shezhi"></span>
+                    <span class="iconfont icon-guanji"></span>
+                </div>
+            </a>
+            <br>
+            <a href="/analysis/index/" class="list-group-item "><span class="iconfont icon-ditu"></span> Region</a>
+            <br>
+            <a href="/analysis/source/" class="list-group-item"><span class="iconfont icon-xinwen"></span>Source</a><br>
+            <a href="/analysis/manner/" class="list-group-item active"><span class="iconfont icon-qingxubianhuaguokuai"></span>Emotion</a><br>
+            <a href="/analysis/ThemeRelationGraph/" class="list-group-item"><span class="iconfont icon-guanxitu"></span>Relation</a><br>
+            <a href="/analysis/CommentWordCloud/" class="list-group-item"><span class="iconfont icon-yonghu"></span>User</a><br>
+            <a href="/topic" class="list-group-item"><span class="iconfont icon-chaojihuati-remendianjitai"></span>HotTopic</a><br>
+            <a href="/comments" class="list-group-item"><span class="iconfont icon-linedesign-01 active"></span>Comments</a><br>
+
+
+        </div>
+        <div id="chartcanvas" style="width: 600px;height:600px;"></div>
+        <div id="linecanvas" style="width: 800px;height:600px"></div>
+        <button type="button" id="show-theme-btn" data-container="body" data-toggle="popover" data-placement="top" 
+        title="" data-content="当天的内容" style="border-radius:50%"></button>
+    </div>
+    <script>
+        //弹出框初始化
+        $("[data-toggle='popover']").popover();
+        //暂时常量
+            var START_DATE='2019-06-01'
+            var END_DATE='2019-07-01'
+            var RANGE='2019-06'
+            var AJAX_NUM='0'
+
+            var cellSize = [80, 80];
+            var pieRadius = 30;
+            var mannerDate={}
+            //格式 {"2019-06-01":[100,100],"2019-06-02":[200,100],.....}
+
+            var timedata=[]
+            var myChart = echarts.init(document.getElementById('chartcanvas'));
+            myChart.showLoading()
+
+            function getPieSeries(chart) {
+                myChart.showLoading()
+                let date=+echarts.number.parseDate(START_DATE);
+                let end=+echarts.number.parseDate(END_DATE);
+                let dayTime=3600*24*1000
+                timedata=[]
+                for (let time = date; time < end; time += dayTime) {
+                    timedata.push([
+                        echarts.format.formatTime('yyyy-MM-dd', time),
+                    ]);
+                }
+                console.log(timedata)
+                // $.ajax({
+                //     async:false,
+                //     type:'GET',
+                //     url:'/manner_by_date?date='+RANGE,
+                //     success:function(data){
+                //         data=JSON.parse(data)
+                //         for(key of data){
+                //             data[key][0]=data[key][0]?data[key][0]:1*Math.random()
+                //             data[key][1]=data[key][1]?data[key][1]:1*Math.random()
+                //             data[key][0]=data[key][0].toFixed(1)
+                //             data[key][1]=data[key][1].toFixed(1)
+                //         }
+                //         mannerDate=data
+                //     }
+                // })
+                echarts.util.map(timedata, function (item, index) {
+                    var center = chart.convertToPixel('calendar', item);
+                    console.log('item:'+item)
+                    let manner=[]
+                    myChart.hideLoading()
+                    $.ajax({
+                        async:true,
+                        type:'GET',
+                        url:'/manner_by_date?date='+item,
+                        success:function(data){
+                            AJAX_NUM++
+                            console.log(data)
+                            myChart.hideLoading()
+                            data=JSON.parse(data)
+                            manner[0]=data[0]?data[0]:1*Math.random()
+                            manner[1]=data[1]?data[1]:1*Math.random()
+                            manner[0]=manner[0].toFixed(1)
+                            manner[1]=manner[1].toFixed(1)
+                            // console.log(manner)
+                            mannerDate[item]=manner
+                            myChart.setOption({
+                                series:{
+                                    id: index + 'pie',
+                                    type: 'pie',
+                                    center: center,
+                                    label: {
+                                        normal: {
+                                            formatter: '{c}',
+                                            position: 'inside'
+                                        }
+                                    },
+                                    radius: pieRadius,
+                                    data: [
+                                        {name: '积极', value: mannerDate[item][0],itemStyle:{color:'#FFA500'}},
+                                        {name: '消极', value: mannerDate[item][1],itemStyle:{color:'#4169E1'}}
+                                    ]
+                                }
+                            })
+                            console.log(AJAX_NUM)
+                            if(AJAX_NUM==30){
+                                //全部加载完毕就画折线图
+                                myLineChart.setOption({
+                                    title:{
+                                        text:'评论舆情变化趋势',
+                                        subtext:'RANDOM',
+                                        left:'center'
+                                    },
+                                    tooltip:{
+                                        trigger:'axis'
+                                    },
+                                    legend:{
+                                        data:['积极','消极'],
+                                        left:'right'
+                                    },
+                                    xAxis:{
+                                        type:'category',
+                                        boundaryGap:false,
+                                        data:timedata
+                                    },
+                                    yAxis:{
+                                        type:'value'
+                                    },
+                                    series:[
+                                        {
+                                            name:'积极',
+                                            type:'line',
+                                            data:Object.keys(mannerDate).map(item=>mannerDate[item][0]),
+                                            markPoint:{
+                                                data:[
+                                                    {type:"max",name:'max'},
+                                                    {type:'min',name:'min'}
+                                                ]
+                                            },
+                                            markLine:{
+                                                data:[
+                                                    {type:'average',name:'average'}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            name:'消极',
+                                            type:"line",
+                                            data:Object.keys(mannerDate).map(item=>mannerDate[item][1]),
+                                            markPoint:{
+                                                data:[
+                                                    {type:"max",name:'max'},
+                                                    {type:'min',name:'min'}
+                                                ]
+                                            },
+                                            markLine:{
+                                                data:[
+                                                    {type:'average',name:'average'}
+                                                ]
+                                            }
+                                        }
+
+                                    ]
+                                })
+                                myLineChart.on('click',function(params){
+                                    console.log(params)
+                                    console.log(params.seriesName+" "+params.name)
+                                    $.get('/theme_content_by_date?manner='+params.seriesName+"&date="+params.name,function(data){
+                                        console.log(data)
+                                        data=JSON.parse(data)
+                                        console.log("theme::"+data.theme)
+                                        $('#show-theme-btn').attr("title",data.theme)
+                                        $('#show-theme-btn').attr("data-content",data.theme+"\n"+data.date+"\n"+data.content)
+                                        $('#show-theme-btn').popover('toggle')
+                                        $('#show-theme-btn').popover('show')
+                                    })
+                                    
+                                })
+                            }
+                        }
+                    })
+                });
+            }
+            //把日历图画出来
+            myChart.setOption(option = {
+                title:{
+                    left:'center',
+                    subtext:RANGE,
+                    text:'评论情感日历图'
+                },
+                tooltip : {},
+                legend: {
+                    data: ['积极', '消极'],
+                    bottom: 20
+                },
+                calendar: {
+                    top: 'middle',
+                    left: 'center',
+                    orient: 'vertical',
+                    cellSize: 80,
+                    yearLabel: {
+                        show: false,
+                        textStyle: {
+                            fontSize: 30
+                        }
+                    },
+                    dayLabel: {
+                        margin: 20,
+                        firstDay: 1,
+                        nameMap: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+                    },
+                    monthLabel: {
+                        show: false
+                    },
+                    range: [RANGE]
+                },
+                series: [{
+                    id: 'label',
+                    type: 'scatter',
+                    coordinateSystem: 'calendar',
+                    symbolSize: 1
+                }]
+                }
+            )
+            //把饼图画出来
+            // myChart.setOption({
+            //     series:getPieSeries(myChart)
+            // })
+
+
+            //画右边的折线图
+            var myLineChart=echarts.init(document.getElementById('linecanvas'))
+            getPieSeries(myChart)
+
+        </script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

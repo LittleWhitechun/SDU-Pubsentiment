@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>事件关键词词云</title>
+    <script type="text/javascript" src="/static/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/static/js/echarts-wordcloud.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+
+    <style>
+
+        #chart-container {
+            margin-left: 150px;
+            padding: 10px;
+            vertical-align: top;
+            display: inline-block;
+
+        }
+
+        #chart-canvas {
+            width: 1000px;
+            height: 500px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+    <ul class="navbar-nav  navbar-mynav-ul">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+    </ul>
+</nav>
+<div class="container" id="container">
+
+    <div class="sider-bar">
+        <a class="sider-bar-title list-group-item" style="color: white">
+            舆情分析系统
+        </a>
+        <br>
+        <a class="list-group-item">
+            <div class="sider-bar-info">
+                <img src="/static/images/icon.png">
+                <div class="sider-bar-info-text"><h5>当前领域</h5></div>
+                <div class="sider-bar-info-text">外交</div>
+
+                <span class="iconfont icon-yonghu2"></span>
+                <span class="iconfont icon-shezhi"></span>
+                <span class="iconfont icon-guanji"></span>
+            </div>
+        </a>
+        <br>
+        <a href="/analysis/index/" class="list-group-item "><span class="iconfont icon-ditu"></span>Distribute</a><br>
+        <a href="/analysis/source/" class="list-group-item"><span class="iconfont icon-xinwen"></span>Source</a><br>
+        <a href="/analysis/manner/" class="list-group-item"><span class="iconfont icon-qingxubianhuaguokuai"></span>Emotion</a><br>
+        <a href="/analysis/ThemeRelationGraph/" class="list-group-item active">Relation</a><br>
+        <a href="/analysis/CommentWordCloud/" class="list-group-item">Region</a><br>
+        <a href="/analysis/WeiboUserAnalysis/" class="list-group-item">Users</a><br>
+        <a href="/topic" class="list-group-item">HotTopic</a><br>
+        <a href="/comments" class="list-group-item">Comments</a><br>
+
+    </div>
+    <div id="chart-container">
+        <div id="chart-canvas"></div>
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+        <div id="main" style="width: 1300px;height:600px;"></div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var Dict = {{ data|safe }};  //注意一定要加safe方法过滤
+
+    // console.log("haha")
+    console.log("haha");
+    console.log(typeof (Dict));
+    console.log(Dict);
+    console.log("haaaaa");
+
+    const chart = echarts.init(document.getElementById('chart-canvas'));
+    console.log("hah");
+    chart.setOption({
+        series: [{
+            name: "词云数据加载尝试",
+            type: 'wordCloud',
+            shape: 'circle',
+            data: Dict,
+
+            left: 'center',
+            top: 'center',
+            width: '70%',
+            height: '80%',
+            right: null,
+            bottom: null,
+            sizeRange: [12, 60],
+            rotationRange: [-90, 90],
+            rotationStep: 45,
+            gridSize: 8, drawOutOfBound: false,
+            textStyle: {
+                normal: {
+                    fontFamily: 'sans-serif',
+                    fontWeight: 'bold',
+                    color: function () {
+                        return 'rgb(' + [
+                            Math.round(Math.random() * 160),
+                            Math.round(Math.random() * 160),
+                            Math.round(Math.random() * 160)
+                        ].join(',') + ')';
+                    }
+                },
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowColor: '#333'
+                }
+            }
+        }]
+    });
+
+</script>
+</body>
+</html>

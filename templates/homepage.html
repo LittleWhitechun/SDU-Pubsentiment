@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HOME PAGE</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_7qk0w2zvsg5.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/echarts.js"></script>
+    <script src='/static/js/Convert_Pinyin.js'></script>
+    <style>
+       .navbar-mynav-ul{
+        /* margin-left: 0 */
+       }
+        
+        .search-icon-container{
+            margin-left: 40%;
+            padding: 0;
+        }
+        .search-icon{
+            font-size: 100px;
+            text-align: center;
+        }
+        .icon-yuqingfenxi{
+            margin-left: 45px;
+        }
+        .search-input-container{
+            text-align: center
+        }
+        .search-input-container .search-input{
+            width: 25%;
+            margin-left: 33.5%;
+        }
+        .search-input-container .btn-default{
+            background-color: #87CEFA;
+            color: white
+        }
+        .search-input-container .btn-default:hover{
+            background-color: #00BFFF
+        }
+        .recommend-container{
+            margin-left: 43.5%
+        }
+        .recommend-item{
+            background-color: #FF8C00;
+            width:fit-content;
+            padding: 10px;
+            font-size: 20px;
+            color: white;
+            border-radius: 25%;
+            margin-top: 15px;
+            cursor: pointer;
+
+        }
+        .recommend-item:hover{
+            background-color: #F4A460
+        }
+        .homepage-container{
+
+        }
+        
+    </style>	
+</head>
+<body>
+    <nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+        <ul class="navbar-nav  navbar-mynav-ul" style="margin-left: 0">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Active</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Disabled</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="homepage-container">
+        <div class="search-icon-container">
+        <span class="search-icon iconfont icon-yuqingfenxi"></span>
+        <br/>
+         <h3>互联网舆情分析平台</h3>
+        <!-- <span class="iconfont icon-yuqingbiaoqian" ></span> -->
+        <!-- <span class="search-icon iconfont icon-yuqingbiaoqian"></span> -->
+        </div>
+        <div class="search-input-container">
+            <div class="search-input input-group">
+                <input id="search-input-content" type="text" class="form-control" >
+                <span class="input-group-btn">
+                    <button id="search-input-button" class="btn btn-default" type="button"><a href="/analysis/index/" style="color: white">Search!</a></button>
+                </span>
+            </div>
+        </div>
+        <!--?<div class="recommend-container">-->
+            <!--?<div class="recommend-item">-->
+                <!--?外交-->
+            <!--?</div>-->
+            <!--?<div class="recommend-item">-->
+                <!--?体育-->
+            <!--?</div>-->
+        <!--?</div>-->
+    </div>
+
+    
+    
+
+    <script type="text/javascript">
+        $('#search-input-button').on('click',function(){
+            localStorage.setItem('field',$('#search-input-content').val())
+        })
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试所用的首页</title>
+    <script>
+    function test()
+    {
+        var s = document.getElementById("txt");
+        window.location.href="http://127.0.0.1:8000/analysis/ThemeRelationGraph?"+"txt="+encodeURI(s.value);
+    }
+</script>
+</head>
+
+<body>
+<!--测试所用的首页，供用户选择领域并跳转到主题相关图界面-->
+
+<input type="text" id="txt"/>
+<input type="button" value="TEST" onclick="test()"/>
+</body>
+</html>

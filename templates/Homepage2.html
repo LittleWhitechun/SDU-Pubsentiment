@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>舆情分析系统</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>舆情分析</h2>
+    <div class="btn-group">
+        <button type="button" style="background-color: #4169E1;border: #9999ff double" class="btn btn-primary">领域选择
+        </button>
+        <button type="button" style="background-color: #4169E1;border: #9999ff double"
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown">
+            <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="#">外交</a>
+            <a class="dropdown-item" href="#">体育</a>
+            <a class="dropdown-item" href="#">经济</a>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" style="background-color: #4169E1;border: #9999ff double" class="btn btn-secondary">地域范围
+        </button>
+        <button type="button" style="background-color: #4169E1;border: #9999ff double"
+                class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown">
+            <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="#">全国范围</a>
+            <a class="dropdown-item" href="#">世界范围</a>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" style="background-color: #4169E1;border: #9999ff double" class="btn btn-success">媒体类型
+        </button>
+        <button type="button" style="background-color: #4169E1;border: #9999ff double"
+                class="btn btn-success dropdown-toggle dropdown-toggle-split" data-toggle="dropdown">
+            <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="#">新闻</a>
+            <a class="dropdown-item" href="#">微博</a>
+        </div>
+    </div>
+
+</div>
+<div style="padding: 100px 100px 10px;">
+    <form class="bs-example bs-example-form" role="form">
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="请输入关键字">
+                    <span class="input-group-btn">
+						<button class="btn btn-default" type="button">
+							搜索
+						</button>
+					</span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+    </form>
+</div>
+</body>
+</html>

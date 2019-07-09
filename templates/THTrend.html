@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/static/js/echarts.js"></script>
+    <script type="text/javascript" src="/static/js/echarts-wordcloud.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/reset.css">
+     <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_5m3cryo2qvq.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1283614_eqf92ecqthb.css">
+    <title>主题热度变化趋势</title>
+</head>
+<body>
+{#导航栏#}
+<nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+    <ul class="navbar-nav  navbar-mynav-ul">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="container" id="container">
+
+    <div class="sider-bar">
+        <a class="sider-bar-title list-group-item" style="color: white">
+            舆情分析系统
+        </a>
+        <br>
+        <a class="list-group-item">
+            <div class="sider-bar-info">
+                <img src="/static/images/icon.png">
+                <div class="sider-bar-info-text"><h5>当前领域</h5></div>
+                <div class="sider-bar-info-text">外交</div>
+
+                <span class="iconfont icon-yonghu2"></span>
+                <span class="iconfont icon-shezhi"></span>
+                <span class="iconfont icon-guanji"></span>
+            </div>
+        </a>
+            <br>
+            <a href="/analysis/index/" class="list-group-item "><span class="iconfont icon-ditu"></span> Region</a>
+            <br>
+            <a href="/analysis/source/" class="list-group-item"><span class="iconfont icon-xinwen"></span>Source</a><br>
+            <a href="/analysis/manner/" class="list-group-item"><span class="iconfont icon-qingxubianhuaguokuai"></span>Emotion</a><br>
+            <a href="/analysis/ThemeRelationGraph/" class="list-group-item"><span class="iconfont icon-guanxitu"></span>Relation</a><br>
+            <a href="/analysis/CommentWordCloud/" class="list-group-item"><span class="iconfont icon-yonghu"></span>User</a><br>
+            <a href="/topic" class="list-group-item active"><span class="iconfont icon-chaojihuati-remendianjitai"></span>HotTopic</a><br>
+            <a href="/comments" class="list-group-item "><span class="iconfont icon-linedesign-01 active"></span>Comments</a><br>
+
+
+    </div>
+    <div id="chart-container">
+        <div id="chart-canvas"></div>
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+        <div id="HeatTrend" style="width:600px;height:500px;margin-left: 180px;display: inline-block"></div>
+        <div id="main" style="width:600px;height:500px;display: inline-block"></div>
+    </div>
+    <button type="button" style="margin-top: 10px" class="btn btn-info" @click="back">Back</button>
+</div>
+
+<script type="text/javascript">
+
+    //处理前端传来的数据，转换成json键值对的格式
+    var Names = localStorage.getItem("temp")
+    console.log(typeof (Names))
+    console.log(Names)
+    var jsonnames = JSON.parse(Names)
+    console.log(jsonnames)
+    var charData = []
+    for (key in jsonnames) {
+        let tmp = {}
+        tmp['name'] = key
+        tmp['value'] = jsonnames[key]
+        charData.push(tmp)
+    }
+
+    //动态生成echarts词云图
+    var myChart = echarts.init(document.getElementById('main'));
+    var maskImage = new Image();
+    maskImage.src = "/static/images/map.jpg"
+    maskImage.onload = function () {
+        myChart.setOption({
+            backgroundColor: '#fff',
+            tooltip: {
+                show: false
+            },
+            series: [{
+                type: 'wordCloud',
+                gridSize: 1,
+                sizeRange: [12, 55],
+                rotationRange: [-45, 0, 45, 90],
+                maskImage: maskImage,
+                textStyle: {
+                    normal: {
+                        color: function () {
+                            return 'rgb(' +
+                                Math.round(Math.random() * 255) +
+                                ', ' + Math.round(Math.random() * 255) +
+                                ', ' + Math.round(Math.random() * 255) + ')'
+                        }
+                    }
+                },
+                left: 'center',
+                top: 'center',
+                bottom: null,
+                data: charData
+            }]
+        })
+    }
+
+
+    //生成位于界面上方的“热度趋势”折线图
+    var myChart2 = echarts.init(document.getElementById('HeatTrend'));
+
+    //获取的时间&热度信息
+    var Res = localStorage.getItem("temp1")
+    console.log(typeof (Res))
+    console.log(Res)
+    var jsonRes = JSON.parse(Res)
+    console.log(jsonRes)
+    console.log(jsonRes['a'])
+    console.log(jsonRes['b'])
+
+
+    //设置myChart2的option
+    option = {
+        tooltip: {
+            trigger: 'axis',
+            position: function (pt) {
+                return [pt[0], '10%'];
+            }
+        },
+        title: {
+            left: 'center',
+            text: '主题热度趋势变化',
+        },
+        toolbox: {
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: jsonRes['a']
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%']
+        },
+        dataZoom: [{
+            type: 'inside',
+            start: 0,
+            end: 10
+        }, {
+            start: 0,
+            end: 10,
+            handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+            handleSize: '80%',
+            handleStyle: {
+                color: '#fff',
+                shadowBlur: 3,
+                shadowColor: 'rgba(0, 0, 0, 0.6)',
+                shadowOffsetX: 2,
+                shadowOffsetY: 2
+            }
+        }],
+        series: [
+            {
+                name: '主题热度变化趋势',
+                type: 'line',
+                smooth: true,
+                symbol: 'none',
+                sampling: 'average',
+                itemStyle: {
+                    color: 'rgb(255, 70, 131)'
+                },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: 'rgb(255, 158, 68)'
+                    }, {
+                        offset: 1,
+                        color: 'rgb(255, 70, 131)'
+                    }])
+                },
+                data: jsonRes['b']
+            }
+        ]
+    };
+    myChart2.setOption(option)
+</script>
+</body>
+</html>

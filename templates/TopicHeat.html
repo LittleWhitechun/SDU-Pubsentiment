@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>热门主题排行榜</title>
+    <script type="text/javascript" src="/static/js/echarts.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+     <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_5m3cryo2qvq.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1283614_eqf92ecqthb.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+    <style>
+        .list-group li {
+            cursor: pointer;
+        }
+
+        #main {
+            display: inline-block;
+        }
+
+        #news {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+{#导航栏#}
+<nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+    <ul class="navbar-nav  navbar-mynav-ul">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="container" id="container">
+
+    <div class="sider-bar">
+        <a class="sider-bar-title list-group-item" style="color: white">
+            舆情分析系统
+        </a>
+        <br>
+        <a class="list-group-item">
+            <div class="sider-bar-info">
+                <img src="/static/images/icon.png">
+                <div class="sider-bar-info-text"><h5>当前领域</h5></div>
+                <div class="sider-bar-info-text">外交</div>
+
+                <span class="iconfont icon-yonghu2"></span>
+                <span class="iconfont icon-shezhi"></span>
+                <span class="iconfont icon-guanji"></span>
+            </div>
+        </a>
+        <br>
+            <a href="/analysis/index/" class="list-group-item  "><span class="iconfont icon-ditu"></span> Region</a>
+            <br>
+            <a href="/analysis/source/" class="list-group-item"><span class="iconfont icon-xinwen"></span>Source</a><br>
+            <a href="/analysis/manner/" class="list-group-item"><span class="iconfont icon-qingxubianhuaguokuai"></span>Emotion</a><br>
+            <a href="/analysis/ThemeRelationGraph/" class="list-group-item"><span class="iconfont icon-guanxitu"></span>Relation</a><br>
+            <a href="/analysis/CommentWordCloud/" class="list-group-item"><span class="iconfont icon-yonghu"></span>User</a><br>
+            <a href="/topic" class="list-group-item active"><span class="iconfont icon-chaojihuati-remendianjitai"></span>HotTopic</a><br>
+            <a href="/comments" class="list-group-item"><span class="iconfont icon-linedesign-01"></span>Comments</a><br>
+
+    </div>
+    <div id="chart-container">
+        <div id="chart-canvas"></div>
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+        <div id="main" style="width: 650px;height:500px;margin-left: 110px"></div>
+        <div id="news" style="vertical-align: top;width: 570px;height: 500px;overflow: auto">
+            <ul class="list-group">
+
+            </ul>
+        </div>
+    </div>
+    <button type="button" style="margin-top: 10px" class="btn btn-info" @click="back">Back</button>
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+
+                </h4>
+            </div>
+            <div class="modal-body" id="modal-content">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default"
+                        data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+
+    var Dict = {{ topicheat|safe }};  //注意一定要加safe方法过滤
+    console.log(Dict['a'])
+    console.log(Dict['b'])
+
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 显示标题，图例和空的坐标轴
+    myChart.setOption({
+        title: {
+            text: '热门主题排行榜'
+        },
+        tooltip: {},
+        legend: {
+            data: ['热度']
+        },
+        xAxis: {
+            data: []
+        },
+        dataZoom: [{                 // 内置于坐标系中，使用户可以在坐标系上通过鼠标拖拽、鼠标滚轮、手指滑动（触屏上）来缩放或漫游坐标系
+            type: 'inside',
+            start: 0,
+            end: 10
+        }, {
+            start: 0,
+            end: 10,                  // handleIcon 手柄的 icon 形状，支持路径字符串
+            handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+            handleSize: '80%',        //  控制手柄的尺寸，可以是像素大小，也可以是相对于 dataZoom 组件宽度的百分比，默认跟 dataZoom 宽度相同。
+            handleStyle: {
+                color: 'pink',
+                shadowBlur: 3,      // shadowBlur图片阴影模糊值，shadowColor阴影的颜色
+                shadowColor: 'red',
+                shadowOffsetX: 2,
+                shadowOffsetY: 2
+            }
+        }],
+        yAxis: {},
+        series: [{
+            name: '热度',
+            type: 'bar',
+            data: []
+        }]
+    });
+
+    // 填入数据
+    myChart.setOption({
+
+        xAxis: {
+            data: Dict['a'],
+            axisLabel: {
+                formatter: function (value) {
+                    return value.split("").join("\n");
+                }
+            }
+        },
+        series: [{
+            name: '热度',
+            data: Dict['b'],
+            itemStyle: {
+                normal: {
+                    color: new echarts.graphic.LinearGradient(
+                        0, 0, 0, 1,
+                        [
+                            {offset: 0, color: '#FF4500'},
+                            {offset: 1, color: '#FF8C00'}
+                        ]
+                    )
+                },
+                emphasis: {
+                    color: new echarts.graphic.LinearGradient(
+                        0, 0, 0, 1,
+                        [
+                            {offset: 0, color: '#FF8C00'},
+                            {offset: 1, color: '#FF4500'}
+                        ]
+                    )
+                }
+            },
+        }
+        ],
+        dataZoom: [{
+            type: 'inside',
+            start: 0,
+            end: 10
+        }, {
+            start: 0,
+            end: 10,
+            handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+            handleSize: '80%',
+            handleStyle: {
+                color: '#fff',
+                shadowBlur: 3,
+                shadowColor: 'rgba(0, 0, 0, 0.6)',
+                shadowOffsetX: 2,
+                shadowOffsetY: 2
+            }
+        }]
+    });
+    //单击延时触发
+    var clickTimeId;
+    myChart.on('click', function (params) {
+        // 取消上次延时未执行的方法
+        clearTimeout(clickTimeId);
+        //执行延时
+        clickTimeId = setTimeout(function () {
+            //此处为单击事件要执行的代码
+            if (params.componentType == "xAxis") {
+                alert("单击了" + params.value + "x轴标签");
+            } else if (params.componentType == "yAxis") {
+                alert("单击了" + params.value + "y轴标签");
+            } else {
+                alert("单击了" + params.name + "柱状图" + params.value);//name主题，value热度
+                $.ajax({
+                    url: '/search',
+                    type: 'GET',
+                    data: {
+                        'clicktop': params.name
+                    },
+                    success: function (data) {
+                        $('.list-group').empty()
+                        for (item of data.msg) {
+                            console.log(item)
+                            let li = $("<li class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#myModal\"></li>").text(item);
+                            $('.list-group').append(li)
+                        }
+
+                        $('.list-group').on('click', 'li', function () {
+                            var tmpcontent = $(this).text()
+                            $.ajax({
+                                url: '/searchContent',
+                                type: 'GET',
+                                data: {
+                                    'clicktitle': tmpcontent
+                                },
+                                success: function (data) {
+                                    $('#myModalLabel').text(tmpcontent)
+                                    $('#modal-content').text(data.tcon)
+                                }
+                            })
+                        })
+
+                    }
+                })
+            }
+        }, 250);
+    });
+    myChart.on('dblclick', function (params) {
+        // 取消上次延时未执行的方法
+        clearTimeout(clickTimeId);
+        if (params.componentType == "xAxis") {
+            alert("双击了" + params.value + "x轴标签");
+        } else if (params.componentType == "yAxis") {
+            alert("双击了" + params.value + "y轴标签");
+        } else {
+
+            $.ajax({
+                url: '/relation',
+                type: 'GET',
+                data: {
+                    'NameCloud': params.name
+                },
+                success: function (data) {
+                    console.log("-------------------" + data.namemsg);
+                    var obj = JSON.stringify(data.namemsg)
+                    localStorage.setItem("temp", obj)
+                    alert("双击了" + params.name + "柱状图" + params.value);//name主题，value热度
+                    window.location.href = '/THTrend';
+                }
+            })
+            $.ajax({
+                url: '/trend',
+                type: 'GET',
+                data: {
+                    'heatTrend': params.name
+                },
+                success: function (data) {
+                    console.log("time-----------------------" + data.timedata);
+                    var obj = JSON.stringify(data.timedata)
+                    localStorage.setItem("temp1", obj)
+                    window.location.href = '/THTrend';
+
+                }
+            })
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+$('#cur-field').text(localStorage.getItem('field'))

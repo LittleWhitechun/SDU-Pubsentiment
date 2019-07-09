@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Source</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_5m3cryo2qvq.css">
+     <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_5m3cryo2qvq.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1283614_eqf92ecqthb.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="/static/js/echarts.js"></script>
+    <script src='/static/js/Convert_Pinyin.js'></script>
+    <style>
+
+        #chartcanvas {
+            margin-top: 35px;
+            display: inline-block
+        }
+
+        .list-group-titles {
+            margin-top: 35px;
+            display: inline-block;
+            vertical-align: top;
+            max-height: 500px;
+            overflow: auto;
+            max-width: 600px;
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+    <ul class="navbar-nav  navbar-mynav-ul">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+    </ul>
+</nav>
+<div class="container" id="container">
+    <div class="sider-bar">
+        <a class="sider-bar-title list-group-item" style="color: white">
+            舆情分析系统
+        </a>
+        <br>
+        <a class="list-group-item">
+            <div class="sider-bar-info">
+                <img src="/static/images/icon.png">
+                <div class="sider-bar-info-text"><h5>当前领域</h5></div>
+                <div class="sider-bar-info-text">外交</div>
+
+                <span class="iconfont icon-yonghu2"></span>
+                <span class="iconfont icon-shezhi"></span>
+                <span class="iconfont icon-guanji"></span>
+            </div>
+        </a>
+        <br>
+            <a href="/analysis/index/" class="list-group-item "><span class="iconfont icon-ditu"></span> Region</a>
+            <br>
+            <a href="/analysis/source/" class="list-group-item active"><span class="iconfont icon-xinwen"></span>Source</a><br>
+            <a href="/analysis/manner/" class="list-group-item"><span class="iconfont icon-qingxubianhuaguokuai"></span>Emotion</a><br>
+            <a href="/analysis/ThemeRelationGraph/" class="list-group-item"><span class="iconfont icon-guanxitu"></span>Relation</a><br>
+            <a href="/analysis/CommentWordCloud/" class="list-group-item"><span class="iconfont icon-yonghu"></span>User</a><br>
+            <a href="/topic" class="list-group-item"><span class="iconfont icon-chaojihuati-remendianjitai"></span>HotTopic</a><br>
+            <a href="/comments" class="list-group-item"><span class="iconfont icon-linedesign-01"></span>Comments</a><br>
+    </div>
+
+    <div id="chartcanvas" style="width: 600px;height:400px;"></div>
+    <button type="button" style="margin-top: -10px;margin-left: -20px" class="btn btn-info" @click="back">Back</button>
+    <ul class="list-group list-group-titles">
+        <li data-toggle="modal" data-target="#content-modal" v-cloak
+            class="list-group-item" v-for="(news,index) in sourcenews" @click='showContent(news)'>
+            [[news.time.slice(0,10)]]
+            [[news.title]]
+        </li>
+    </ul>
+    <div class="modal fade" id="content-modal">
+        <div class="modal-dialog">
+            <div class="modal-content" data-html="true">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">
+                        [[ newstitle ]]
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    [[ newscontent ]]
+                </div>
+                <a href="#" class="thumbnail" v-for="imgurl in newsimg">
+                    <img :src="imgurl" alt="x">
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: '#container',
+        delimiters: ['[[', ']]'],
+        data: {
+            myChart: '',
+            sources: {},
+            piedata: [],
+            othernum: 0,
+            source: '',
+            option: {},
+            sourcenews: [],
+            newscontent: '',
+            newstitle: '',
+            newsimg: [],
+            curPie: ''
+        },
+        methods: {
+            showContent: function (news) {
+                console.log(JSON.stringify(news))
+                let reg = new RegExp("<br/>", "g");
+                this.newscontent = news.content.replace(reg, "\r\n");
+                this.newstitle = news.title.replace(' ', '')
+                this.newsimg = news.imgs
+                console.log(this.newscontent)
+            },
+            comparePieData: function (data1, data2) {
+                let v1 = data1.value
+                let v2 = data2.value
+                return v2 - v1
+            },
+            back: function () {
+                let _this = this
+                if (_this.curPie) {
+                    myChart.setOption({
+                        title: {
+                            text: '主题消息来源',
+                            subtext: '新闻网站',
+                            x: 'center'
+                        },
+                        series: [{
+                            data: _this.piedata
+                        }]
+                    })
+                    _this.sourcenews = []
+                }
+                _this.curPie = ''
+            }
+        },
+        mounted: function () {
+            myChart = echarts.init(document.getElementById('chartcanvas'));
+            myChart.showLoading()
+            var sources = {}
+            var othernum = 0;
+            var source = ''
+            var option = {
+                title: {
+                    text: 'source'
+                },
+            }
+            var that = this;
+            var _this = this
+            $.ajax({
+                url: '/static/data/WebData.news_china.json',
+                async: false,
+                success: function (data) {
+                    // console.log("data::::::::"+data)
+                    for (item of data) {
+                        source = item['source']
+                        if (sources[source]) {
+                            sources[source]++
+                        } else {
+                            sources[source] = 1
+                        }
+                    }
+                    for (let key in sources) {
+                        if (sources[key] > 20) {
+                            console.log(`ket : ${key},value:${sources[key]}`)
+                            that.piedata.push({'value': sources[key], 'name': key})
+                        } else {
+                            othernum += sources[key]
+                        }
+                    }
+                    console.log(that.piedata)
+                    that.piedata.push({'value': othernum, 'name': '其他'})
+                    myChart.setOption({
+                        title: {
+                            text: '主题消息来源',
+                            subtext: '新闻网站',
+                            x: 'center'
+                        },
+                        series: [
+                            {
+                                name: 'source',
+                                data: that.piedata,
+                                type: 'pie',
+                                radius: '70%'
+                            }
+                        ]
+                    })
+                    myChart.hideLoading()
+                    console.log('draw over')
+                    myChart.on('click', function (params) {
+                        if (that.curPie) {
+                            $.get('/source_media_title_by_key?source=' + that.curPie + '&key=' + params['name'], function (data, status) {
+                                that.sourcenews = JSON.parse(data)
+                            })
+                        } else {
+                            console.log('wu curpie!!!!!!!!')
+                            var source_name = params['name']
+                            that.curPie = source_name
+                            $.get('/source_news?source=' + source_name, function (data, status) {
+                                that.sourcenews = JSON.parse(data)
+                                console.log(that.sourcenews)
+                            })
+                            //TODO:点击后出现该媒体的关键词饼图
+                            $.get('/source_media_key?source=' + source_name, function (data, status) {
+                                let json_data = []
+                                data = JSON.parse(data)
+                                json_data = data.sort(that.comparePieData).slice(0, 12)
+                                console.log(json_data)
+                                myChart.setOption({
+                                    title: {
+                                        text: source_name
+                                    },
+                                    series: [
+                                        {
+                                            name: 'source',
+                                            data: json_data
+                                        }
+                                    ]
+                                })
+                            })
+                        }
+
+
+                    })
+                }
+
+            })
+        }
+    })
+</script>
+
+</body>
+</html>

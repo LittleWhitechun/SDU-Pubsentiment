@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>主题相关图</title>
+    <script type="text/javascript" src="/static/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+     <link rel="stylesheet" href="//at.alicdn.com/t/font_1278259_5m3cryo2qvq.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_1283614_eqf92ecqthb.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+
+    <style>
+
+        #chart-container {
+            margin-left: 150px;
+            padding: 10px;
+            vertical-align: top;
+            display: inline-block;
+
+        }
+
+        #chart-canvas {
+            width: 1000px;
+            height: 500px;
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+<nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+    <ul class="navbar-nav  navbar-mynav-ul">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+    </ul>
+</nav>
+<div class="container" id="container">
+
+    <div class="sider-bar">
+        <a class="sider-bar-title list-group-item" style="color: white">
+            舆情分析系统
+        </a>
+        <br>
+        <a class="list-group-item">
+            <div class="sider-bar-info">
+                <img src="/static/images/icon.png">
+                <div class="sider-bar-info-text"><h5>当前领域</h5></div>
+                <div class="sider-bar-info-text">外交</div>
+
+                <span class="iconfont icon-yonghu2"></span>
+                <span class="iconfont icon-shezhi"></span>
+                <span class="iconfont icon-guanji"></span>
+            </div>
+        </a>
+        <br>
+            <a href="/analysis/index/" class="list-group-item "><span class="iconfont icon-ditu"></span> Region</a>
+            <br>
+            <a href="/analysis/source/" class="list-group-item"><span class="iconfont icon-xinwen"></span>Source</a><br>
+            <a href="/analysis/manner/" class="list-group-item"><span class="iconfont icon-qingxubianhuaguokuai"></span>Emotion</a><br>
+            <a href="/analysis/ThemeRelationGraph/" class="list-group-item active"><span class="iconfont icon-guanxitu"></span>Relation</a><br>
+            <a href="/analysis/CommentWordCloud/" class="list-group-item"><span class="iconfont icon-yonghu"></span>User</a><br>
+            <a href="/topic" class="list-group-item"><span class="iconfont icon-chaojihuati-remendianjitai"></span>HotTopic</a><br>
+            <a href="/comments" class="list-group-item"><span class="iconfont icon-linedesign-01"></span>Comments</a><br>
+    </div>
+    <div id="chart-container">
+        <div id="chart-canvas" style="height: 600px;width: 500px"></div>
+    </div>
+    <button type="button" style="margin-top: 10px" class="btn btn-info" @click="back">Back</button>
+</div>
+
+
+<script type="text/javascript">
+    // 获取地址中传来的参数
+    var loc = location.href;
+    var n1 = loc.length;
+    var n2 = loc.indexOf("=");
+    var id = decodeURI(loc.substr(n2 + 1, n1 - n2));
+    console.log("id");
+    console.log(id);
+
+    $.ajax({
+        type: "GET",
+        url: '/analysis/ThemeRelationGraph/',
+        data: {target: id},
+        success: function (data) {
+            console.log("success");
+            const chart = echarts.init(document.getElementById('chart-canvas'))
+            var data =
+            {{ data_name|safe }}
+            var links = {{ links|safe }}
+                console.log(data);
+            console.log(links);
+            chart.on('click', function (params) {
+                console.log("click params");
+                console.log(params.name);
+                // 跳转到事件关键词词云
+                window.location.href = "http://127.0.0.1:8000/analysis/EventWordCloud/?" + "theme=" + encodeURI(params.name);
+            });
+
+            chart.setOption({
+                series: [
+                    {
+                        type: 'graph',
+                        layout: 'force',
+                        symbolSize: 50,
+                        animation: false,
+                        draggable: true,
+                        roam: true,
+                        label: {
+                            normal: {
+                                show: true
+                            }
+                        },
+                        roam: true,
+                        force: {
+                            repulsion: 1,
+                            edgeLength: 400,
+                            gravity: 0.2
+                        },
+                        //edgeSymbol: ['circle', 'arrow'],
+                        //edgeSymbolSize: [4, 10],
+                        //edgeLabel: {
+                        //   normal: {
+                        //       textStyle: {
+                        //          fontSize: 20
+                        //      }
+                        //  }
+                        //},
+                        data: data,
+                        links: links,
+                        //lineStyle: {
+                        //    normal: {
+                        //        opacity: 0.9,
+                        //        width: 2,
+                        //        curveness: 0
+                        //   }
+                        // }
+                    }
+                ]
+            });
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(errorThrown);
+        }
+    });
+
+
+</script>
+</body>
+</html>

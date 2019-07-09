@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选定主题下所有事件列表</title>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="/static/js/vue.min.js"></script>
+
+    <style>
+
+        #chart-container {
+            margin-left: 150px;
+            padding: 10px;
+            vertical-align: top;
+            display: inline-block;
+
+        }
+
+        #chart-canvas {
+            width: 1000px;
+            height: 500px;
+        }
+
+    </style>
+</head>
+<body>
+
+<nav class="navbar-expand-sm bg-primary navbar-dark navbar-mynav">
+    <ul class="navbar-nav  navbar-mynav-ul">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Active</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+    </ul>
+</nav>
+<div class="container" id="container">
+
+    <div class="sider-bar">
+        <a href="/analysis/index/" class="list-group-item "><span class="iconfont icon-ditu"></span>Distribute</a><br>
+        <a href="/analysis/source/" class="list-group-item"><span class="iconfont icon-xinwen"></span>Source</a><br>
+        <a href="/analysis/manner/" class="list-group-item"><span class="iconfont icon-qingxubianhuaguokuai"></span>Emotion</a><br>
+        <a href="/analysis/ThemeRelationGraph/" class="list-group-item">Relation</a><br>
+        <a href="/analysis/CommentWordCloud/" class="list-group-item">Region</a><br>
+        <a href="/analysis/WeiboUserAnalysis/" class="list-group-item">Users</a><br>
+        <a href="/topic" class="list-group-item">HotTopic</a><br>
+        <a href="/comments" class="list-group-item">Comments</a><br>
+
+    </div>
+    <div id="chart-container">
+        <div id="chart-canvas">
+            <div>
+                <script>
+                    var data = {{ data|safe }};
+                </script>
+                <ul>
+                    {% for item in data %}
+                        <li><a href="{{ item.url }}">{{ item.content }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
